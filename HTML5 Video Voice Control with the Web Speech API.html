@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!-- saved from url=(0047)https://iandevlin.com/examples/speechapi-video/ -->
+<html><head lang="en-IE"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+	<title>HTML5 Video Voice Control with the Web Speech API</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="./HTML5 Video Voice Control with the Web Speech API_files/style.css" rel="stylesheet" media="all">
+<style type="text/css">.speech-recognition-status.expanded{color:#111;width:100%;box-shadow:0 0 16px 0 #bbb;border:1px solid #bbb;border-radius:5px;background:#fff;background:-webkit-linear-gradient(top,#fff,#fcfcfc 61%,#ededed 99%);z-index:10}.speech-recognition-status.expanded .status{display:flex;justify-content:space-between;align-items:center}.speech-recognition-status.expanded .status .speech{display:flex;border:1px solid #ccc;width:90%;margin:.7em;border-radius:.3em;font-size:1.1em}.speech-recognition-status.expanded .status .speech .context{font-weight:600;margin-right:.5em;border-right:1px solid #ccc;background:#eee;display:inline-block;color:#333;border-radius:.3em;padding:.5em;border-bottom-right-radius:0;border-top-right-radius:0;text-transform:capitalize}.speech-recognition-status.expanded .status .speech .current-speech{display:inline-block;color:#aaa;padding:.5em}.speech-recognition-status.expanded .status .speech .current-speech.final{color:#111}.speech-recognition-status.expanded .status .status-icon-container{width:3em;display:inline-block;text-aligin:center}.speech-recognition-status.expanded .status .status-icon-container i{font-size:2em}.speech-recognition-status.expanded .status .status-icon-container i.fa-microphone-slash,.speech-recognition-status.expanded .status .status-icon-container i.fa-refresh{color:#777}.speech-recognition-status.expanded .status .status-icon-container i.fa-exclamation-circle{color:#c93b2a}.speech-recognition-status.compact{position:fixed;bottom:5em;width:auto;z-index:2100000000;display:flex;align-items:center}.speech-recognition-status.compact .status-icon-container{text-align:center;width:3em;height:3em;border-radius:100%;border-top-left-radius:0;border-bottom-left-radius:0;display:flex;align-items:center;box-shadow:0 0 8px 0 #000;border:1px solid #bbb;background:#fff;background:-webkit-linear-gradient(top,#fff,#fcfcfc 61%,#ededed 99%)}.speech-recognition-status.compact .status-icon-container i{font-size:2em}.speech-recognition-status.compact .status-icon-container i.fa-microphone-slash,.speech-recognition-status.compact .status-icon-container i.fa-refresh{color:#777}.speech-recognition-status.compact .status-icon-container i.fa-exclamation-circle{color:#c93b2a}.speech-recognition-status.compact .status-icon-container.sleeping i{color:#ccc}.speech-recognition-status.compact .status-icon-container.sleeping .first{position:absolute;top:11px;left:21px;font-size:12px;color:#888}.speech-recognition-status.compact .status-icon-container.sleeping .second{position:absolute;top:-1px;left:27px;font-size:16px}.speech-recognition-status.compact .status-details{margin-left:-1em;z-index:-1;border:1px solid #bbb;background:#fff;border-radius:7px;box-shadow:0 0 5px -1px #777}.speech-recognition-status.compact .status-details .context{font-weight:600;margin-right:.5em;border-right:1px solid #ccc;background:#eee;display:inline-block;color:#333;border-radius:.3em;padding:.5em;border-bottom-right-radius:0;border-top-right-radius:0;text-transform:capitalize;padding-left:1.5em}.speech-recognition-status.compact .status-details .current-speech{display:inline-block;color:#aaa;padding:.5em .5em .5em 0}.speech-recognition-status.compact .status-details .current-speech.final{color:#111}.speech-recognition-status.compact .status-details.without-context .current-speech{padding-left:1.5em}</style><style>
+    @font-face {
+      font-family: 'FontAwesome';
+      src: url('chrome-extension://ldfboinpfdahkgnljbkohgimhimmafip/font-awesome/fontawesome-webfont.eot') format("eot"),
+           url('chrome-extension://ldfboinpfdahkgnljbkohgimhimmafip/font-awesome/fontawesome-webfont.woff2') format('woff2'),
+           url('chrome-extension://ldfboinpfdahkgnljbkohgimhimmafip/font-awesome/fontawesome-webfont.woff') format('woff'),
+           url('chrome-extension://ldfboinpfdahkgnljbkohgimhimmafip/font-awesome/fontawesome-webfont.ttf') format('truetype'),
+           url('chrome-extension://ldfboinpfdahkgnljbkohgimhimmafip/font-awesome/fontawesome-webfont.svg#fontawesomeregular') format('svg');
+      font-weight: normal;
+      font-style: normal;
+    }
+  </style><script src="chrome-extension://ldfboinpfdahkgnljbkohgimhimmafip/native-commands-handler.js" id="nativeCommands"></script></head>
+<body>
+	<main role="main">
+		<h1><abbr title="HyperText Markup Language 5">HTML5</abbr> Video Voice Control with the Web Speech <abbr title="Application Programming Interface">API</abbr></h1>
+		<p>Read the related <a href="http://www.iandevlin.com/blog/2014/01/javascript/using-the-web-speech-api-to-control-a-html5-video/">article</a>.</p>
+		<div class="msg" data-state="hidden">This browser doesn't support the WebKit Web Speech <abbr title="Application Programming Interface">API</abbr>. You need the latest version of Chrome. Sorry!</div>
+		<video id="v" controls="" preload="metadata">
+			<source src="video/big-buck-bunny.mp4" type="video/mp4">
+		</video>
+		<textarea placeholder="input text" id="transcript"></textarea>
+		<button id="btn" onclick="startDictation()">start</button>
+		<div class="rec-status">Recogniser status:<span id="recStatus">not recognising</span></div>
+		<button id="startRecBtn">Start Recognition</button>
+		<button id="stopRecBtn">Stop Recognition</button>
+		<p>Click "Start Recognition", give microphone access permission and start controlling the video's playback, mute and volume control via speech.<br>Available commands are:</p>
+		<ul>
+			<li id="vidPlay">"video play"</li>
+			<li id="vidStop">"video stop"</li>
+			<li id="vidReplay">"video replay"</li>
+			<li id="vidVolOn">"video volume on"</li>
+			<li id="vidVolOff">"video volume off"</li>
+			<li id="vidVolInc">"video volume increase"</li>
+			<li id="vidVolDec">"video volume decrease"</li>
+		</ul>
+	</main>
+	<script src="./HTML5 Video Voice Control with the Web Speech API_files/ga.js.download"></script><script src="./HTML5 Video Voice Control with the Web Speech API_files/video-speech.js.download" defer=""></script>
+	<script>
+		var _gaq=[['_setAccount','UA-2046650-1'],['_trackPageview']];(function(a,b){var c=a.createElement(b),d=a.getElementsByTagName(b)[0];c.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";d.parentNode.insertBefore(c,d)})(document,"script");
+	</script>
+
+<div id="browser-voice-control"></div></body></html>
